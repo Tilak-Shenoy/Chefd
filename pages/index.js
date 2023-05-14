@@ -2,7 +2,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import firebase from "../pages/api/initFirebase"
 import ReadFirebase from "../pages/api/readFirebase"
-import { Button, Title } from "@tremor/react";
+import { Title } from "@tremor/react";
 
 
 export default function Home() {
