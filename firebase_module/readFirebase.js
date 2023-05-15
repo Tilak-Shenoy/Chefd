@@ -1,8 +1,8 @@
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { app, database } from '../api/initFirebase';
+import { app, database } from '../firebase_module/initFirebase';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import styles from '../../styles/Home.module.css'
+import styles from '../styles/Home.module.css'
 import { Table,
   TableHead,
   TableRow,
