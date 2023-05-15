@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import firebase from "../firebase_module/initFirebase"
-import ReadFirebase from "../firebase_module/readFirebase"
+import firebase from "../pages/api/initFirebase"
+import ReadFirebase from "../pages/api/readFirebase"
 import { Card, List, ListItem, Title } from "@tremor/react";
 
 
