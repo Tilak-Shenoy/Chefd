@@ -7,14 +7,12 @@
   },
   "dependencies": {
     "@material-tailwind/react": "^2.0.0",
-    "@tremor/react": "^2.5.0",
+    "@tremor/react": "^2.4.0",
     "firebase": "^9.20.0",
     "firebase-admin": "^11.7.0",
     "next": "latest",
-    "openai": "^3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "unsplash-js": "^7.0.18",
     "yarn": "^1.22.19"
   },
   "devDependencies": {
