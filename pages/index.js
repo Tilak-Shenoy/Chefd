@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import ReadFirebase from "../../api/readFirebase"
+import ReadFirebase from "../pages/api/readFirebase"
 import { Title } from "@tremor/react";
 
 
