@@ -31,7 +31,7 @@ export default function Recipe() {
 
 
 	const unsplash = createApi({
-	  accessKey: process.env.UNSPLASH_API_KEY,
+	  accessKey: process.env.NEXT_UNSPLASH_API_KEY,
 	});
 
 	async function moveToPantry(){
