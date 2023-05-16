@@ -9,9 +9,8 @@ import { Table,
   TableHeaderCell,
   TableBody,
   TableCell,
-  Text} from "@tremor/react";
-
-
+  Text, Button} from "@tremor/react";
+import { useRouter } from 'next/router';
 
 const dbInstance = collection(database, 'ing');
 export default function IngredientOperation() {
@@ -20,6 +19,7 @@ export default function IngredientOperation() {
 	const [groupIngArray, setGroupIngArray] = useState([])
 	const [pantry, setPantry] = useState([])
 
+	const router = useRouter();
 
 	const getIng = async() => {
 		if (ingArray.length === 0) {
@@ -45,37 +45,44 @@ export default function IngredientOperation() {
     function addToPantry(ingredient){
     	const newObj = {};
   		newObj[ingredient.id] = ingredient;
-    	// setPantry((prev) => {...prev, ..newObj})
 		setPantry(prevObject => ({ ...prevObject, ...newObj }));
 		console.log(pantry)
 	}
 
-
     return (
     	<>
-    		<div className={styles.ing}>
-    			{Object.entries(groupIngArray).map(([category, ingredients]) => (
-				  <div key={category} className={styles.category}>
-				    <Text className = {styles.w600} variant="title">{category}</Text>
-				    <Table>
-				      <TableBody>
-				        {ingredients.map((ingredient) => (
-				          <TableRow key={ingredient.id} onClick= {() =>addToPantry(ingredient)}>
-				          	<TableCell>
-				          		<input type="checkbox" id="checkbox"/>
-				          	</TableCell>
-				            <TableCell>
-				              <Image src={ingredient.image} width={72} height={72}  />
-				            </TableCell>
-				            <TableCell>
-				              <Text>{ingredient.name}</Text>
-				            </TableCell>
-				          </TableRow>
-				        ))}
-				      </TableBody>
-				    </Table>
-				  </div>
-				))}
+	    	<div>
+	    		<div>
+	    			<Button color = "blue" className = {styles.button} size="sm" 
+	    				onClick = {() => router.push({
+							    pathname: '/recipes',
+							    query: {pantry}
+							})}>Pantry</Button>
+	    		</div>
+	    		<div className={styles.ing}>
+	    			{Object.entries(groupIngArray).map(([category, ingredients]) => (
+					  <div key={category} className={styles.category}>
+					    <Text className = {styles.w600} variant="title">{category}</Text>
+					    <Table>
+					      <TableBody>
+					        {ingredients.map((ingredient) => (
+					          <TableRow key={ingredient.id} onClick= {() =>addToPantry(ingredient)}>
+					          	<TableCell>
+					          		<input type="checkbox" id="checkbox"/>
+					          	</TableCell>
+					            <TableCell>
+					              <Image src={ingredient.image} width={72} height={72}  />
+					            </TableCell>
+					            <TableCell>
+					              <Text>{ingredient.name}</Text>
+					            </TableCell>
+					          </TableRow>
+					        ))}
+					      </TableBody>
+					    </Table>
+					  </div>
+					))}
+	    		</div>
     		</div>
     	</>
 	)

@@ -2,14 +2,14 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import firebase from "../pages/api/initFirebase"
 import ReadFirebase from "../pages/api/readFirebase"
-import { Card, List, ListItem, Title } from "@tremor/react";
+import { Title } from "@tremor/react";
 
 
 export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Chef'd</title>
+        <Title>Chef'd</Title>
         <meta name="description" content="Generate Recipes" />
          <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />

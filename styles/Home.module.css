@@ -132,3 +132,18 @@
     flex-direction: column;
   }
 }
+
+.button {
+  color: #1D5E24;
+  background-color: #ffffff;
+  margin-left: 100%;
+}
+
+.recipe {
+  margin: -20rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.main{
+  font-family: 'Montserrat', sans-serif;
+}
