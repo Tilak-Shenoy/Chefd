@@ -20,6 +20,10 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+.pointer{
+  cursor: pointer;
+}
+
 .title a {
   color: #0070f3;
   text-decoration: none;
@@ -139,11 +143,19 @@
   margin-left: 100%;
 }
 
-.recipe {
-  margin: -20rem;
+.recipe { 
   font-family: 'Montserrat', sans-serif;
 }
 
 .main{
   font-family: 'Montserrat', sans-serif;
+}
+
+.recipeImage {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.recipeBody{
+  margin-top: 16px;
 }

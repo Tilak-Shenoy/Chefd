@@ -11,9 +11,12 @@ export default function Recipe() {
 
 
 	const [result, setResult] = useState(['','','',''])
+	const [ingredientNames, setIngredientNames] = useState([])
 
 	const router = useRouter();
-	const pantry = router;
+	const { data } = router.query;
+  	const pantry = data ? JSON.parse(data) : null;
+
 	const [im, setIm] = useState({
 		results: [
 				{
@@ -32,13 +35,23 @@ export default function Recipe() {
 	});
 
 	async function moveToPantry(){
+
+		var ingNames =[]
+
+		for(var x in pantry){
+			console.log(pantry[x].name)
+			ingNames.push(pantry[x].name)
+		}
+
+		console.log(ingNames)
+
 		try {
 	      const response = await fetch("/../api/gpt", {
 	        method: "POST",
 	        headers: {
 	          "Content-Type": "application/json",
 	        },
-	        body: JSON.stringify({ animal: pantry }),
+	        body: JSON.stringify({ animal: ingNames }),
 	      });
 
 	      const data = await response.json();
@@ -46,7 +59,7 @@ export default function Recipe() {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
 
-	      console.log(data)
+	      console.log('Response ', data)
 	      setResult(data.result.split(':'));
 	      await getImg(data.result.split(':')[1].toString().slice(0,-12));
 		    } catch(error) {
@@ -64,9 +77,10 @@ export default function Recipe() {
 
 	async function getImg(recipe){
 			await unsplash.search.getPhotos({
-			 query: recipe,
-			 page: 1,
-			 perPage: 1
+				 query: recipe,
+				 page: 1,
+				 perPage: 1,
+				 orientation: 'landscape'
 			  }).then(result => {
 			  if (result.errors) {
 			    // handle error here
@@ -83,8 +97,7 @@ export default function Recipe() {
 	return (
 		<div className={styles.container}>
 	    	<Head>
-		        <title onClick = {() => router.push({
-							    pathname: '/recipes'})}>Chef'd</title>
+		        <title>Chef'd</title>
 		        <meta name="description" content="Generate Recipes" />
 		         <link rel="preconnect" href="https://fonts.googleapis.com" />
 		        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
@@ -97,21 +110,20 @@ export default function Recipe() {
 
 
   			<main className={styles.main}>
-		        <div className = {styles.header}>
-		          <h2> Chef'd</h2>
-		        </div>
-		        <div>
-		        	<Image src={im.results[0].urls.regular} width={im.results[0].width/10}
-	    			 height = {im.results[0].height/10}/>
-			    	<h2>{result[0]}</h2>
-			    	<h2>{result[1].toString().slice(0,-12)}</h2>
-			    	<br></br>
-			    	<h4>{result[1].toString().slice(-11,-1)}</h4>
-			    	<p>{result[2].toString().slice(0,-13)}</p>
-			    	<br></br>
-			    	<br/>
-			    	<h4>{result[2].toString().slice(-12,-1)}</h4>
-			    	<p>{result[3]}</p>
+  				<div>
+		        	<div className = {styles.header}>
+		          		<h2 className={styles.pointer} onClick = {() => router.push({
+							    pathname: '/'})}> Chef'd</h2>
+		        	</div>
+			        <div className={styles.recipeBody}>
+			        	<Image className={styles.recipeImage} src={im.results[0].urls.regular} width={im.results[0].width/10}
+		    			 height = {im.results[0].height/10}/>
+				    	<h2>{result[1].toString().slice(0,-12)}</h2>
+				    	<h4>{result[1].toString().slice(-11,-1)}</h4>
+				    	<p>{result[2].toString().slice(0,-13)}</p>
+				    	<h4>{result[2].toString().slice(-12,-1)}</h4>
+				    	<p>{result[3]}</p>
+		        	</div>
 	        	</div>
         	</main>
     	</div>
