@@ -44,9 +44,9 @@ export default function IngredientOperation() {
 
     function addToPantry(ingredient){
     	const newObj = {};
-  		newObj[ingredient.id] = ingredient;
-		setPantry(prevObject => ({ ...prevObject, ...newObj }));
-		console.log(pantry)
+  		// newObj[ingredient.id] = ingredient;
+			setPantry([ ...pantry, ingredient ]);
+			console.log(pantry)
 	}
 
     return (
@@ -56,7 +56,7 @@ export default function IngredientOperation() {
 	    			<Button color = "blue" className = {styles.button} size="sm" 
 	    				onClick = {() => router.push({
 							    pathname: '/recipes',
-							    query: {pantry}
+							    query: { data: JSON.stringify(pantry) }
 							})}>Pantry</Button>
 	    		</div>
 	    		<div className={styles.ing}>

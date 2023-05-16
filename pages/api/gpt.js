@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.NEXT_OPENAI_API_KEY,
 });
 
 const openai = new OpenAIApi(configuration);
@@ -25,6 +25,9 @@ export default async function Gpt(req, res) {
     });
     return;
   }
+
+
+    console.log('body: ', animal)
 
   try {
     const completion = await openai.createCompletion({
@@ -55,7 +58,7 @@ export default async function Gpt(req, res) {
 }
 
 function generatePrompt(animal) {
-  const capitalizedAnimal = animal;
-  return `Suggest a recipes with following key ingredients. Specify the recipe name, ingredients and instructions
-  Ingredients: ${capitalizedAnimal}`;
+  return `Suggest a recipes with following key ingredients. Clearly show the recipe name, ingredients and instructions.
+  List each ingredient and instruction in a separate line
+  Ingredients: ${animal}`;
 }
