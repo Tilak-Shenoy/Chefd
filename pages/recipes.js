@@ -83,8 +83,8 @@ export default function Recipe() {
 	return (
 		<div className={styles.container}>
 	    	<Head>
-		        <Title onClick = {() => router.push({
-							    pathname: '/recipes'})}>Chef'd</Title>
+		        <title onClick = {() => router.push({
+							    pathname: '/recipes'})}>Chef'd</title>
 		        <meta name="description" content="Generate Recipes" />
 		         <link rel="preconnect" href="https://fonts.googleapis.com" />
 		        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
