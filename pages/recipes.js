@@ -54,7 +54,7 @@ export default function Recipe() {
 		      console.error(error);
 		      alert(error.message);
 		    }
-		    
+
 		}
 
 	useEffect(() => {
@@ -83,7 +83,8 @@ export default function Recipe() {
 	return (
 		<div className={styles.container}>
 	    	<Head>
-		        <Title>Chef'd</Title>
+		        <title onClick = {() => router.push({
+							    pathname: '/recipes'})}>Chef'd</title>
 		        <meta name="description" content="Generate Recipes" />
 		         <link rel="preconnect" href="https://fonts.googleapis.com" />
 		        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
@@ -102,7 +103,7 @@ export default function Recipe() {
 		        <div>
 		        	<Image src={im.results[0].urls.regular} width={im.results[0].width/10}
 	    			 height = {im.results[0].height/10}/>
-			    	<h2>{result[0]} : </h2>
+			    	<h2>{result[0]}</h2>
 			    	<h2>{result[1].toString().slice(0,-12)}</h2>
 			    	<br></br>
 			    	<h4>{result[1].toString().slice(-11,-1)}</h4>
