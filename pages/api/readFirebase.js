@@ -52,7 +52,7 @@ export default function IngredientOperation() {
     return (
     	<>
 	    	<div>
-	    		<div>
+	    		<div className={styles.fabDiv}>
 	    			<Button color = "blue" className = {styles.button} size="sm" 
 	    				onClick = {() => router.push({
 							    pathname: '/recipes',

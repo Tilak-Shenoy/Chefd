@@ -10,7 +10,8 @@
 .header{
   color: #ffffff;
   background: #1D5E24;
-  position:absolute;
+  position:fixed;
+  z-index: 1;
   left:0;
   top:0;
   padding-right: 100%;
@@ -138,9 +139,12 @@
 }
 
 .button {
-  color: #1D5E24;
-  background-color: #ffffff;
+  color: #ffffff;
+  background-color: #1D5E24;
   margin-left: 100%;
+  margin-top: 24px;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .recipe { 
@@ -158,4 +162,10 @@
 
 .recipeBody{
   margin-top: 16px;
+}
+
+.fabDiv{
+  position: fixed;
+  right: 72px;
+  top: 72px;
 }
