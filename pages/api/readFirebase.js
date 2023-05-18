@@ -45,7 +45,11 @@ export default function IngredientOperation() {
     function addToPantry(ingredient){
     	const newObj = {};
   		// newObj[ingredient.id] = ingredient;
-			setPantry([ ...pantry, ingredient ]);
+  		if(!pantry.find(ele => ele.id === ingredient.id)){
+  			setPantry([ ...pantry, ingredient ]);	
+  			console.log('Entered if')
+  		}
+			
 			console.log(pantry)
 	}
 
