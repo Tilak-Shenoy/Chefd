@@ -9,8 +9,12 @@ import { Table,
   TableHeaderCell,
   TableBody,
   TableCell,
-  Text, Button} from "@tremor/react";
+  Text} from "@tremor/react";
 import { useRouter } from 'next/router';
+import { Button } from '@chakra-ui/react'
+import { MdOutlineFoodBank } from 'react-icons/md'
+import { Icon } from '@chakra-ui/react'
+
 
 const dbInstance = collection(database, 'ing');
 export default function IngredientOperation() {
@@ -46,20 +50,19 @@ export default function IngredientOperation() {
     	const newObj = {};
   		// newObj[ingredient.id] = ingredient;
   		if(!pantry.find(ele => ele.id === ingredient.id)){
-  			setPantry([ ...pantry, ingredient ]);	
-  			console.log('Entered if')
+  			setPantry([ ...pantry, ingredient ]);
   		}
-			
-			console.log(pantry)
 	}
+
 
     return (
     	<>
 	    	<div>
 	    		<div className={styles.fabDiv}>
-	    			<Button color = "blue" className = {styles.button} size="sm" 
+	    			<Button colorScheme = "dark green" className = {styles.button}  size="md" mt = '3vh' 
+	    				leftIcon = {<Icon as={MdOutlineFoodBank}  boxSize={6} />}
 	    				onClick = {() => router.push({
-							    pathname: '/recipes',
+							    pathname: '/pantry',
 							    query: { data: JSON.stringify(pantry) }
 							})}>Pantry</Button>
 	    		</div>

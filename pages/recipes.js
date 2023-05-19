@@ -1,11 +1,10 @@
-import { Card, Metric, Text } from "@tremor/react";
 import styles from '../styles/Home.module.css'
 import Head from 'next/head'
-import { Button, Title } from "@tremor/react";
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
 import { createApi } from 'unsplash-js';
 import Image from 'next/image';
+import { Heading, Text} from '@chakra-ui/react'
 
 export default function Recipe() {
 
@@ -36,6 +35,7 @@ export default function Recipe() {
 
 	async function moveToPantry(){
 
+		// Create a list of names of ingredients for passing to GPT API
 		var ingNames =[]
 
 		for(var x in pantry){
@@ -112,17 +112,17 @@ export default function Recipe() {
   			<main className={styles.main}>
   				<div>
 		        	<div className = {styles.header}>
-		          		<h2 className={styles.pointer} onClick = {() => router.push({
-							    pathname: '/'})}> Chef'd</h2>
+		          		<Heading className={styles.pointer} onClick = {() => router.push({
+							    pathname: '/'})}> Chef'd</Heading>
 		        	</div>
 			        <div className={styles.recipeBody}>
 			        	<Image className={styles.recipeImage} src={im.results[0].urls.regular} width={im.results[0].width/10}
 		    			 height = {im.results[0].height/10}/>
-				    	<h2>{result[1].toString().slice(0,-12)}</h2>
-				    	<h4>{result[1].toString().slice(-11,-1)}</h4>
-				    	<p>{result[2].toString().slice(0,-13)}</p>
-				    	<h4>{result[2].toString().slice(-12,-1)}</h4>
-				    	<p>{result[3]}</p>
+				    	<Heading as='h3' mt='16px'>{result[1].toString().slice(0,-12)}</Heading>
+				    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,-1)}</Heading>
+				    	<Text>{result[2].toString().slice(0,-13)}</Text>
+				    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,-1)}</Heading>
+				    	<Text>{result[3]}</Text>
 		        	</div>
 	        	</div>
         	</main>
