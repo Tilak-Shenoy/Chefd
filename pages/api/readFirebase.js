@@ -29,7 +29,7 @@ export default function IngredientOperation() {
 		if (ingArray.length === 0) {
 		    getDocs(dbInstance)
 		      .then((data) => {
-		        const ingredients = data.docs.map((item) => ({ ...item.data(), id: item.id }));
+		        const ingredients = data.docs.map((item) => ({ ...item.data(), key: item.id }));
 		        setIngArray(ingredients);
 		        setGroupIngArray(ingredients.reduce((group, product) => {
 		          const { category } = product;
@@ -49,7 +49,7 @@ export default function IngredientOperation() {
     function addToPantry(ingredient){
     	const newObj = {};
   		// newObj[ingredient.id] = ingredient;
-  		if(!pantry.find(ele => ele.id === ingredient.id)){
+  		if(!pantry.find(ele => ele.key === ingredient.key)){
   			setPantry([ ...pantry, ingredient ]);
   		}
 	}

@@ -26,14 +26,9 @@ export default function Recipe() {
 					}
 				}
 			]
-	})
-
-
-	const unsplash = createApi({
-	  accessKey: "9ITU33nvcP18iGsxY5_n_yWmv6xS-l8yKZD1Szs3xVg",
 	});
 
-	async function moveToPantry(){
+	async function loadRecipe(){
 
 		// Create a list of names of ingredients for passing to GPT API
 		var ingNames =[]
@@ -43,15 +38,13 @@ export default function Recipe() {
 			ingNames.push(pantry[x].name)
 		}
 
-		console.log(ingNames)
-
 		try {
 	      const response = await fetch("/../api/gpt", {
 	        method: "POST",
 	        headers: {
 	          "Content-Type": "application/json",
 	        },
-	        body: JSON.stringify({ animal: ingNames }),
+	        body: JSON.stringify({ ingredients: ingNames }),
 	      });
 
 	      const data = await response.json();
@@ -61,6 +54,8 @@ export default function Recipe() {
 
 	      console.log('Response ', data)
 	      setResult(data.result.split(':'));
+
+	      // Generate image from DallE
 	      await getImg(data.result.split(':')[1].toString().slice(0,-12));
 		    } catch(error) {
 		      // Consider implementing your own error handling logic here
@@ -71,27 +66,32 @@ export default function Recipe() {
 		}
 
 	useEffect(() => {
-        moveToPantry();
+        loadRecipe();
     }, [])
 
 
 	async function getImg(recipe){
-			await unsplash.search.getPhotos({
-				 query: recipe,
-				 page: 1,
-				 perPage: 1,
-				 orientation: 'landscape'
-			  }).then(result => {
-			  if (result.errors) {
-			    // handle error here
-			    console.log('error occurred: ', result.errors[0]);
-			  } else {
-			    // handle success here
-			   setIm(result.response);
-			   console.log('Recipe: ', recipe)
-			    console.log(im);
-			  }
-			});
+			
+		try {
+	      const response = await fetch("/../api/dalle", {
+	        method: "POST",
+	        headers: {
+	          "Content-Type": "application/json",
+	        },
+	        body: JSON.stringify({ prompt: recipe }),
+	      });
+
+	      const data = await response.json();
+	      if (response.status !== 200) {
+	        throw data.error || new Error(`Request failed with status ${response.status}`);
+	      }
+	      setIm(data.photo)
+
+		    } catch(error) {
+		      // Consider implementing your own error handling logic here
+		      console.error(error);
+		      alert(error.message);
+		    }
 		}
 
 	return (
@@ -116,8 +116,8 @@ export default function Recipe() {
 							    pathname: '/'})}> Chef'd</Heading>
 		        	</div>
 			        <div className={styles.recipeBody}>
-			        	<Image className={styles.recipeImage} src={im.results[0].urls.regular} width={im.results[0].width/10}
-		    			 height = {im.results[0].height/10}/>
+			        	<Image className={styles.recipeImage} src={im} width={512}
+		    			 height = {512} alt = {result[1].toString().slice(0,-12)}/>
 				    	<Heading as='h3' mt='16px'>{result[1].toString().slice(0,-12)}</Heading>
 				    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,-1)}</Heading>
 				    	<Text>{result[2].toString().slice(0,-13)}</Text>

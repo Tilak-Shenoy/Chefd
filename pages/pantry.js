@@ -14,7 +14,18 @@ export default function Pantry() {
 	const router = useRouter();
 	const { data } = router.query;
   	const pantry = data ? JSON.parse(data) : [];
+  	const [ingPantry, setIngPantry] = useState([]);
   	
+
+  	function deleteIngredient(ing) {
+  		setIngPantry(oldValues => {
+      		return oldValues.filter(ingred => ingred !== ing)
+  		})
+  	}
+
+  	useEffect(() => {
+  		setIngPantry(pantry);
+    }, [])
 
 	return(
 		<>
@@ -35,13 +46,13 @@ export default function Pantry() {
 					leftIcon = {<Icon as={MdOutlineFastfood}  boxSize={6} />}
 					onClick = {() => router.push({
 						    pathname: '/recipes',
-						    query: { data: JSON.stringify(pantry) }
+						    query: { data: JSON.stringify(ingPantry) }
 						})}>Start Cooking</Button>
     		</div>
 
         	<SimpleGrid spacing= {1} templateColumns='repeat(auto-fill, minmax(200px, 1fr))'>
-	        	{pantry.map((ing) => (
-		          	<Card size='sm' maxW='20vh' mt='4vh' align ='center'>
+	        	{ingPantry.map((ing) => (
+		          	<Card size='sm' maxW='20vh' mt='4vh' align ='center' key= {ing.key}>
 					  	<CardBody>
 						    <Image
 						      src= {ing.image}
@@ -52,7 +63,9 @@ export default function Pantry() {
 						      <Text size='md' align='Center'>{ing.name}</Text>
 					  </CardBody>
 					  <CardFooter>
-					      <Button variant='solid' colorScheme='red' rightIcon = {<Icon as={RiDeleteBinFill} />}>
+					      <Button variant='solid' colorScheme='red'
+					       rightIcon = {<Icon as={RiDeleteBinFill} />}
+					       onClick = {() => deleteIngredient(ing)}>
 					        Delete
 					      </Button>
 					  </CardFooter>
