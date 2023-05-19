@@ -13,7 +13,7 @@ export default function Pantry() {
 
 	const router = useRouter();
 	const { data } = router.query;
-  	const pantry = data ? JSON.parse(data) : null;
+  	const pantry = data ? JSON.parse(data) : [];
   	
 
 	return(
