@@ -11,9 +11,8 @@ import { Table,
   TableCell,
   Text} from "@tremor/react";
 import { useRouter } from 'next/router';
-import { Button } from '@chakra-ui/react'
+import { Button, Icon } from '@chakra-ui/react'
 import { MdOutlineFoodBank } from 'react-icons/md'
-import { Icon } from '@chakra-ui/react'
 
 
 const dbInstance = collection(database, 'ing');
