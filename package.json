@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.0.19",
     "@chakra-ui/react": "^2.6.1",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
@@ -21,5 +22,8 @@
     "react-icons": "^4.8.0",
     "unsplash-js": "^7.0.18",
     "yarn": "^1.22.19"
+  },
+  "devDependencies": {
+    "@builder.io/partytown": "^0.8.0"
   }
 }

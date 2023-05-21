@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
 import { createApi } from 'unsplash-js';
 import Image from 'next/image';
-import { Heading, Text} from '@chakra-ui/react'
+import { Heading, Text, Button, Icon } from '@chakra-ui/react'
+import { coffeeIcon } from '../public/coffee'
+import Link from 'next/link'
 
 export default function Recipe() {
 
@@ -108,9 +110,7 @@ export default function Recipe() {
 				<link rel="icon" href="/favicon.ico" />
   			</Head>
 
-
   			<main className={styles.main}>
-  				<div>
 		        	<div className = {styles.header}>
 		          		<Heading className={styles.pointer} onClick = {() => router.push({
 							    pathname: '/'})}> Chef'd</Heading>
@@ -124,8 +124,15 @@ export default function Recipe() {
 				    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,-1)}</Heading>
 				    	<Text>{result[3]}</Text>
 		        	</div>
-	        	</div>
         	</main>
+
+        	<div className={styles.fabBottom}>
+            <Link href = "https://www.buymeacoffee.com/tilakshenoy">
+            <Button  size="md" variant = 'solid' className = {styles.greenText} mt='72px'
+                leftIcon = {<Icon as={coffeeIcon}  boxSize={6} color = 'black' />}>Buy me a coffee</Button>
+             </Link>
+          </div>
+
     	</div>
 
 	)

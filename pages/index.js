@@ -3,8 +3,9 @@ import styles from '../styles/Home.module.css'
 import firebase from "../pages/api/initFirebase"
 import ReadFirebase from "../pages/api/readFirebase"
 import { Analytics } from '@vercel/analytics/react';
-import { Heading} from '@chakra-ui/react'
-
+import { Heading, Button, Icon, HStack } from '@chakra-ui/react'
+import { coffeeIcon } from '../public/coffee'
+import Link from 'next/link'
 
 export default function Home() {
 
@@ -24,14 +25,23 @@ export default function Home() {
 
         <main className={styles.main}>
           <div className = {styles.header}>
-            <Heading> Chef'd</Heading>
+            <HStack className = {styles.nav} spacing='72px'>
+              <Heading> Chef'd</Heading>
+            </HStack>
           </div>
-          <div>
+          <div> 
             <ReadFirebase IngredientOperation/>
             <Analytics />
+          </div>
+          <div className={styles.fabBottom}>
+            <Link href = "https://www.buymeacoffee.com/tilakshenoy">
+            <Button  size="md" variant = 'solid' className = {styles.greenText} mt='72px'
+                leftIcon = {<Icon as={coffeeIcon}  boxSize={6} color = 'black' />}>Buy me a coffee</Button>
+             </Link>
           </div>
         </main>
       </div>
   )
+
 
 }
