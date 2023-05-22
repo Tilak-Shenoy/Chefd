@@ -59,6 +59,6 @@ export default async function Gpt(req, res) {
 
 function generatePrompt(ingredients) {
   return `Suggest a recipes with following key ingredients. Clearly show the recipe name, ingredients and instructions.
-  List each ingredient and instruction in a separate line
+List each ingredient and instruction in a separate line
   Ingredients: ${ingredients}`;
 }

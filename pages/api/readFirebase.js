@@ -45,12 +45,17 @@ export default function IngredientOperation() {
         getIng();
     }, [])
 
-    function addToPantry(ingredient){
-    	const newObj = {};
-  		// newObj[ingredient.id] = ingredient;
-  		if(!pantry.find(ele => ele.key === ingredient.key)){
-  			setPantry([ ...pantry, ingredient ]);
-  		}
+    function addToPantry(event, ingredient){
+    	if(event.target.checked === true) {
+    		if(!pantry.find(ele => ele.key === ingredient.key)){
+  				setPantry([ ...pantry, ingredient ]);
+  			}
+    	} else {
+    		setPantry(pantry.filter(el=> el !== ingredient));
+    	}
+
+    	console.log(pantry)
+  		
 	}
 
 
@@ -72,9 +77,9 @@ export default function IngredientOperation() {
 					    <Table>
 					      <TableBody>
 					        {ingredients.map((ingredient) => (
-					          <TableRow key={ingredient.id} onClick= {() =>addToPantry(ingredient)}>
+					          <TableRow key={ingredient.id}>
 					          	<TableCell>
-					          		<input type="checkbox" id="checkbox"/>
+					          		<input type="checkbox" id="checkbox" onClick= {(event) =>addToPantry(event, ingredient)}/>
 					          	</TableCell>
 					            <TableCell>
 					              <Image src={ingredient.image} width={72} height={72}  />

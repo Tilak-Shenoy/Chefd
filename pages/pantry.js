@@ -50,7 +50,7 @@ export default function Pantry() {
 						})}>Start Cooking</Button>
     		</div>
 
-        	<SimpleGrid spacing= {1} templateColumns='repeat(auto-fill, minmax(200px, 1fr))' mt = '72px'>
+        	<SimpleGrid spacing= {1} templateColumns='repeat(auto-fill, minmax(200px, 1fr))' mt = '72px' ml = '16px'>
 	        	{ingPantry.map((ing) => (
 		          	<Card size='sm' maxW='20vh' mt='4vh' align ='center' key= {ing.key}>
 					  	<CardBody>
