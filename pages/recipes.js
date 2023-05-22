@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
 import { createApi } from 'unsplash-js';
 import Image from 'next/image';
-import { Heading, Text, Button, Icon } from '@chakra-ui/react'
+import { Heading, Text, Button, Icon, Progress } from '@chakra-ui/react'
 import { coffeeIcon } from '../public/coffee'
 import Link from 'next/link'
 
@@ -13,6 +13,7 @@ export default function Recipe() {
 
 	const [result, setResult] = useState(['','','',''])
 	const [ingredientNames, setIngredientNames] = useState([])
+	const [isLoading, setIsLoading] = useState(true)
 
 	const router = useRouter();
 	const { data } = router.query;
@@ -31,12 +32,10 @@ export default function Recipe() {
 	});
 
 	async function loadRecipe(){
-
 		// Create a list of names of ingredients for passing to GPT API
 		var ingNames =[]
 
 		for(var x in pantry){
-			console.log(pantry[x].name)
 			ingNames.push(pantry[x].name)
 		}
 
@@ -53,8 +52,6 @@ export default function Recipe() {
 	      if (response.status !== 200) {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
-
-	      console.log('Response ', data)
 	      setResult(data.result.split(':'));
 
 	      // Generate image from DallE
@@ -87,7 +84,10 @@ export default function Recipe() {
 	      if (response.status !== 200) {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
-	      setIm(data.photo)
+	      if(data !== null){
+	      	setIsLoading(false);
+	      	setIm(data.photo)	
+	      }
 
 		    } catch(error) {
 		      // Consider implementing your own error handling logic here
@@ -116,19 +116,21 @@ export default function Recipe() {
 							    pathname: '/'})}> Chef'd</Heading>
 		        	</div>
 			        <div className={styles.recipeBody}>
-			        	<Image className={styles.recipeImage} src={im} width={512}
-		    			 height = {512} alt = {result[1].toString().slice(0,-12)}/>
+			        	{isLoading && <Progress size='sm' colorScheme = "green" isIndeterminate />}
+			        	<Image className={styles.recipeImage} src={im} width={480}
+		    			 height = {480} alt = {result[1].toString().slice(0,-12)}/>
 				    	<Heading as='h3' mt='16px'>{result[1].toString().slice(0,-12)}</Heading>
-				    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,-1)}</Heading>
+				    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,)}</Heading>
 				    	<Text>{result[2].toString().slice(0,-13)}</Text>
-				    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,-1)}</Heading>
+				    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,)}</Heading>
 				    	<Text>{result[3]}</Text>
 		        	</div>
         	</main>
 
         	<div className={styles.fabBottom}>
             <Link href = "https://www.buymeacoffee.com/tilakshenoy">
-            <Button  size="md" variant = 'solid' className = {styles.greenText} mt='72px'
+            <Button  size="md
+            " variant = 'solid' className = {styles.greenText} mt='72px'
                 leftIcon = {<Icon as={coffeeIcon}  boxSize={6} color = 'black' />}>Buy me a coffee</Button>
              </Link>
           </div>
