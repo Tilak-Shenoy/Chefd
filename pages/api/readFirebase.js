@@ -11,8 +11,8 @@ import { Table,
   TableCell,
   Text} from "@tremor/react";
 import { useRouter } from 'next/router';
-import { Button, Icon } from '@chakra-ui/react'
-import { MdOutlineFoodBank } from 'react-icons/md'
+import { Button, Icon, InputRightElement, InputGroup, Input  } from '@chakra-ui/react'
+import { MdOutlineFoodBank, MdSearch } from 'react-icons/md'
 
 
 const dbInstance = collection(database, 'ing');
@@ -21,6 +21,8 @@ export default function IngredientOperation() {
 	const [ingArray, setIngArray] = useState([])
 	const [groupIngArray, setGroupIngArray] = useState([])
 	const [pantry, setPantry] = useState([])
+	const [value, setValue] = useState('')
+	const [temp, setTemp] = useState()
 
 	const router = useRouter();
 
@@ -45,7 +47,7 @@ export default function IngredientOperation() {
         getIng();
     }, [])
 
-    function addToPantry(event, ingredient){
+  function addToPantry(event, ingredient){
     	if(event.target.checked === true) {
     		if(!pantry.find(ele => ele.key === ingredient.key)){
   				setPantry([ ...pantry, ingredient ]);
@@ -53,9 +55,30 @@ export default function IngredientOperation() {
     	} else {
     		setPantry(pantry.filter(el=> el !== ingredient));
     	}
-
-    	console.log(pantry)
   		
+	}
+
+	function filterIngredients(e) {
+		setValue(e.target.value)
+		var filtered = ingArray.filter((product) => product.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1)
+		if(value === '') {
+			setGroupIngArray(ingArray.reduce((group, product) => {
+        const { category } = product;
+        group[category] = group[category] ?? [];
+        group[category].push(product);
+        return group;
+      }, {}));
+
+		} else {
+			setGroupIngArray(filtered.reduce((group, product) => {
+				const { category } = product;
+        group[category] = group[category] ?? [];
+        group[category].push(product);
+        return group;
+  		}, {}));
+		}
+		
+
 	}
 
 
@@ -69,6 +92,16 @@ export default function IngredientOperation() {
 							    pathname: '/pantry',
 							    query: { data: JSON.stringify(pantry) }
 							})}>Pantry</Button>
+	    		</div>
+	    		<div className = {styles.search}>
+	    			<InputGroup>
+					    <InputRightElement pointerEvents='pointer' width='6.5rem'>
+					    	
+					    <Button className = {styles.greenBg} size = 'md'
+					      rightIcon = {<Icon as= {MdSearch} color = 'black'/>}> Search </Button>
+					    </InputRightElement>
+					    <Input type='search' placeholder='Search Ingredients' value = {value} onChange = {(e) => filterIngredients(e)}/>
+					  </InputGroup>
 	    		</div>
 	    		<div className={styles.ing}>
 	    			{Object.entries(groupIngArray).map(([category, ingredients]) => (
