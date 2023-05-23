@@ -95,10 +95,10 @@ export default function IngredientOperation() {
 	    		</div>
 	    		<div className = {styles.search}>
 	    			<InputGroup>
-					    <InputRightElement pointerEvents='pointer' width='6.5rem'>
+					    <InputRightElement pointerEvents='pointer' width='1.5rem'>
 					    	
 					    <Button className = {styles.greenBg} size = 'md'
-					      rightIcon = {<Icon as= {MdSearch} color = 'black'/>}> Search </Button>
+					      rightIcon = {<Icon as= {MdSearch} color = 'black'/>}/>
 					    </InputRightElement>
 					    <Input type='search' placeholder='Search Ingredients' value = {value} onChange = {(e) => filterIngredients(e)}/>
 					  </InputGroup>
