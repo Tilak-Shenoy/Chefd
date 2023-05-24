@@ -8,11 +8,44 @@ import { Table,
   TableRow,
   TableHeaderCell,
   TableBody,
-  TableCell,
-  Text} from "@tremor/react";
+  TableCell} from "@tremor/react";
 import { useRouter } from 'next/router';
-import { Button, Icon, InputRightElement, InputGroup, Input  } from '@chakra-ui/react'
+import { Button, Icon, InputRightElement, InputGroup, Input,
+				 Card, CardHeader, CardBody, SimpleGrid  } from '@chakra-ui/react'
 import { MdOutlineFoodBank, MdSearch } from 'react-icons/md'
+
+import { Box, Text } from '@chakra-ui/react';
+
+
+// Custom card to add green border onClick
+const CustomCard = ({ ing, handleClick }) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handleCardClick = () => {
+    setIsSelected(!isSelected);
+    handleClick(ing);
+  };
+
+  return (
+    <Box
+      borderWidth={isSelected ? '2px' : '1px'}
+      borderColor={isSelected ? 'green.500' : 'gray.200'}
+      rounded="md"
+      p={4}
+      mt = '8px'
+      cursor="pointer"
+      onClick={handleCardClick}
+      _hover={{ shadow: 'md', 
+  						transform: 'scale(1.1)' }}
+      transition="transform 0.2s"
+    >
+      <Image src={ing.image} alt="Some edible food" width="160" height="72" />
+      <Text size="md" align="center" mt={2}>
+        {ing.name}
+      </Text>
+    </Box>
+  );
+};
 
 
 const dbInstance = collection(database, 'ing');
@@ -30,7 +63,7 @@ export default function IngredientOperation() {
 		if (ingArray.length === 0) {
 		    getDocs(dbInstance)
 		      .then((data) => {
-		        const ingredients = data.docs.map((item) => ({ ...item.data(), key: item.id }));
+		        const ingredients = data.docs.map((item) => ({ ...item.data(), key: item.id}));
 		        setIngArray(ingredients);
 		        setGroupIngArray(ingredients.reduce((group, product) => {
 		          const { category } = product;
@@ -46,17 +79,6 @@ export default function IngredientOperation() {
 	useEffect(() => {
         getIng();
     }, [])
-
-  function addToPantry(event, ingredient){
-    	if(event.target.checked === true) {
-    		if(!pantry.find(ele => ele.key === ingredient.key)){
-  				setPantry([ ...pantry, ingredient ]);
-  			}
-    	} else {
-    		setPantry(pantry.filter(el=> el !== ingredient));
-    	}
-  		
-	}
 
 	function filterIngredients(e) {
 		setValue(e.target.value)
@@ -77,9 +99,26 @@ export default function IngredientOperation() {
         return group;
   		}, {}));
 		}
-		
-
 	}
+
+
+ 	const [selectedCards, setSelectedCards] = useState([]);
+	const handleClick = (ingredient) => {
+
+  	if (selectedCards.includes(ingredient.key)) {
+   		//Deselect a card
+      setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((id) => id !== ingredient.key));
+    	setPantry(pantry.filter(el=> el !== ingredient));
+    } else {
+    	//Select a card
+      setSelectedCards((prevSelectedCards) => [...prevSelectedCards, ingredient.key]);
+      if(!pantry.find(ele => ele.key === ingredient.key)){
+  				setPantry([ ...pantry, ingredient ]);
+  			}
+    }
+
+    console.log(pantry)
+  };
 
 
     return (
@@ -95,38 +134,27 @@ export default function IngredientOperation() {
 	    		</div>
 	    		<div className = {styles.search}>
 	    			<InputGroup>
-					    <InputRightElement pointerEvents='pointer' width='1.5rem'>
-					    	
-					    <Button className = {styles.greenBg} size = 'md'
-					      rightIcon = {<Icon as= {MdSearch} color = 'black'/>}/>
+					    <InputRightElement pointerEvents='pointer' width='6px'>
+					    <Button className = {styles.greenBg} size = 'md' w='6px'
+					      rightIcon = {<Icon as= {MdSearch} boxSize={4} color = 'black'/>}/>
 					    </InputRightElement>
 					    <Input type='search' placeholder='Search Ingredients' value = {value} onChange = {(e) => filterIngredients(e)}/>
 					  </InputGroup>
 	    		</div>
 	    		<div className={styles.ing}>
-	    			{Object.entries(groupIngArray).map(([category, ingredients]) => (
-					  <div key={category} className={styles.category}>
-					    <Text className = {styles.w600} variant="title">{category}</Text>
-					    <Table>
-					      <TableBody>
-					        {ingredients.map((ingredient) => (
-					          <TableRow key={ingredient.id}>
-					          	<TableCell>
-					          		<input type="checkbox" id="checkbox" onClick= {(event) =>addToPantry(event, ingredient)}/>
-					          	</TableCell>
-					            <TableCell>
-					              <Image src={ingredient.image} width={72} height={72}  />
-					            </TableCell>
-					            <TableCell>
-					              <Text>{ingredient.name}</Text>
-					            </TableCell>
-					          </TableRow>
-					        ))}
-					      </TableBody>
-					    </Table>
-					  </div>
-					))}
-	    		</div>
+		        	{Object.entries(groupIngArray).map(([category, ingredients]) => (
+			        <div key={category} className={styles.category}>
+			          <Text className={styles.w800} variant="title">
+			            {category}
+			          </Text>
+			          <SimpleGrid spacing="24px" templateColumns="repeat(auto-fill, minmax(180px, 1fr))">
+			            {ingredients.map((ing) => (
+			              <CustomCard ing={ing} handleClick={handleClick} key={ing.id} />
+			            ))}
+			          </SimpleGrid>
+        </div>
+      ))}
+				  </div>
     		</div>
     	</>
 	)
