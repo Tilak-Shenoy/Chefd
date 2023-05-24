@@ -111,29 +111,29 @@ export default function Recipe() {
   			</Head>
 
   			<main className={styles.main}>
-		        	<div className = {styles.header}>
-		          		<Heading className={styles.pointer} onClick = {() => router.push({
-							    pathname: '/'})}> Chef'd</Heading>
-		        	</div>
-			        <div className={styles.recipeBody}>
-			        	{isLoading && <Progress size='sm' colorScheme = "green" isIndeterminate />}
-			        	<Image className={styles.recipeImage} src={im} width={480}
-		    			 height = {480} alt = {result[1].toString().slice(0,-12)}/>
-				    	<Heading as='h3' mt='16px'>{result[1].toString().slice(0,-12)}</Heading>
-				    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,)}</Heading>
-				    	<Text>{result[2].toString().slice(0,-13)}</Text>
-				    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,)}</Heading>
-				    	<Text>{result[3]}</Text>
-		        	</div>
+	        	<div className = {styles.header}>
+	          		<Heading className={styles.pointer} onClick = {() => router.push({
+						    pathname: '/'})}> Chef'd</Heading>
+	        	</div>
+		        <div className={styles.recipeBody}>
+		        	{isLoading && <Progress size='sm' colorScheme = "green" isIndeterminate />}
+		        	<Image className={styles.recipeImage} src={im} width={480}
+	    			 height = {480} alt = {result[1].toString().slice(0,-12)}/>
+			    	<Heading as='h3' mt='16px'>{result[1].toString().slice(0,-12)}</Heading>
+			    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,)}</Heading>
+			    	<Text>{result[2].toString().slice(0,-13)}</Text>
+			    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,)}</Heading>
+			    	<Text>{result[3]}</Text>
+	        	</div>
+	        	<div className={styles.fabBottom}>
+		            <Link href = "https://www.buymeacoffee.com/tilakshenoy">
+		            <Button  size="md" variant = 'solid' className = {styles.greenText} mt='72px'
+		                leftIcon = {<Icon as={coffeeIcon}  boxSize={6} color = 'black' />}>Buy me a coffee</Button>
+		             </Link>
+          		</div>
         	</main>
 
-        	<div className={styles.fabBottom}>
-            <Link href = "https://www.buymeacoffee.com/tilakshenoy">
-            <Button  size="md
-            " variant = 'solid' className = {styles.greenText} mt='72px'
-                leftIcon = {<Icon as={coffeeIcon}  boxSize={6} color = 'black' />}>Buy me a coffee</Button>
-             </Link>
-          </div>
+        	
 
     	</div>
 
