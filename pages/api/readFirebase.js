@@ -116,8 +116,6 @@ export default function IngredientOperation() {
   				setPantry([ ...pantry, ingredient ]);
   			}
     }
-
-    console.log(pantry)
   };
 
 

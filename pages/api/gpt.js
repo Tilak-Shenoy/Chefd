@@ -26,13 +26,12 @@ export default async function Gpt(req, res) {
     return;
   }
 
-
-    console.log('body: ', ingredients)
+  const cuisine = req.body.cuisine || '';
 
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: generatePrompt(ingredients),
+      prompt: generatePrompt(ingredients, cuisine),
       max_tokens: 1000,
       top_p: 1,
       frequency_penalty: 0,
@@ -57,8 +56,15 @@ export default async function Gpt(req, res) {
   }
 }
 
-function generatePrompt(ingredients) {
-  return `Suggest a recipes with following key ingredients. Clearly show the recipe name, ingredients and instructions.
-Discard any unnecessary ingredients
-  Ingredients: ${ingredients}`;
+function generatePrompt(ingredients, cuisine) {
+  if (cuisine === ''){
+    return `Suggest recipes with following key ingredients. Clearly show the recipe name, ingredients and instructions.
+  Discard any unnecessary ingredients
+    Ingredients: ${ingredients}`;
+
+  } else {
+    return `Suggest ${cuisine} recipes with following key ingredients. Clearly show the recipe name, ingredients and instructions.
+  Discard any unnecessary ingredients
+    Ingredients: ${ingredients}`;
+  }
 }
