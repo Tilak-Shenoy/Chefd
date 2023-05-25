@@ -207,7 +207,8 @@
   border-color: #0070f3;
 }
 
-.activeCard {
-  border-width: 0.5px;
-  border-color: #1D5E24;
+.center{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
