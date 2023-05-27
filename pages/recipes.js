@@ -17,6 +17,7 @@ export default function Recipe() {
 
 	const router = useRouter();
 	const { data } = router.query;
+	const {cuisine} = router.query;
   	const pantry = data ? JSON.parse(data) : null;
 
 	const [im, setIm] = useState({
@@ -45,7 +46,7 @@ export default function Recipe() {
 	        headers: {
 	          "Content-Type": "application/json",
 	        },
-	        body: JSON.stringify({ ingredients: ingNames }),
+	        body: JSON.stringify({ ingredients: ingNames }, { cuisine: cuisine}),
 	      });
 
 	      const data = await response.json();

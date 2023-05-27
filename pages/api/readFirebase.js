@@ -3,15 +3,10 @@ import { app, database } from '../api/initFirebase';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '../../styles/Home.module.css'
-import { Table,
-  TableHead,
-  TableRow,
-  TableHeaderCell,
-  TableBody,
-  TableCell} from "@tremor/react";
 import { useRouter } from 'next/router';
 import { Button, Icon, InputRightElement, InputGroup, Input,
-				 Card, CardHeader, CardBody, SimpleGrid  } from '@chakra-ui/react'
+				 Card, CardHeader, CardBody, SimpleGrid, Alert,
+  AlertIcon, AlertTitle, AlertDescription, useToast  } from '@chakra-ui/react'
 import { MdOutlineFoodBank, MdSearch } from 'react-icons/md'
 
 import { Box, Text } from '@chakra-ui/react';
@@ -27,7 +22,7 @@ const CustomCard = ({ ing, handleClick }) => {
   };
 
   return (
-    <Box
+    <Card
       borderWidth={isSelected ? '2px' : '1px'}
       borderColor={isSelected ? 'green.500' : 'gray.200'}
       rounded="md"
@@ -39,23 +34,27 @@ const CustomCard = ({ ing, handleClick }) => {
   						transform: 'scale(1.1)' }}
       transition="transform 0.2s"
     >
-      <Image src={ing.image} alt="Some edible food" width="160" height="72" />
+    	<CardBody>
+      <Image src={ing.image} className={styles.center} alt="Some edible food" width="160" height="72" />
       <Text size="md" align="center" mt={2}>
         {ing.name}
       </Text>
-    </Box>
+      </CardBody>
+    </Card>
   );
 };
 
 
 const dbInstance = collection(database, 'ing');
+
 export default function IngredientOperation() {
 
 	const [ingArray, setIngArray] = useState([])
 	const [groupIngArray, setGroupIngArray] = useState([])
 	const [pantry, setPantry] = useState([])
 	const [value, setValue] = useState('')
-	const [temp, setTemp] = useState()
+
+	const toast = useToast()
 
 	const router = useRouter();
 
@@ -116,9 +115,28 @@ export default function IngredientOperation() {
   				setPantry([ ...pantry, ingredient ]);
   			}
     }
-
-    console.log(pantry)
   };
+
+
+  function routeToPantry() {
+  	if (pantry.length !== 0) {
+  		router.push({
+	    pathname: '/pantry',
+	    query: { data: JSON.stringify(pantry) }
+	 		 })	
+  	} else {
+  		console.log('error')
+  		return (
+  			toast({
+          title: 'Your pantry is empty!',
+          description: "You can't cook anything if you don't tell us what you got.",
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+			)
+  	}
+  }
 
 
     return (
@@ -127,10 +145,7 @@ export default function IngredientOperation() {
 	    		<div className={styles.fabDiv}>
 	    			<Button colorScheme = "dark green" className = {styles.button}  size="md" mt = '3vh' 
 	    				leftIcon = {<Icon as={MdOutlineFoodBank}  boxSize={6} />}
-	    				onClick = {() => router.push({
-							    pathname: '/pantry',
-							    query: { data: JSON.stringify(pantry) }
-							})}>Pantry</Button>
+	    				onClick = {() => routeToPantry() }>Pantry</Button>
 	    		</div>
 	    		<div className = {styles.search}>
 	    			<InputGroup>
