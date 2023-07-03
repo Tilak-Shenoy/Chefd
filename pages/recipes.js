@@ -2,16 +2,16 @@ import styles from '../styles/Home.module.css'
 import Head from 'next/head'
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
-import { createApi } from 'unsplash-js';
 import Image from 'next/image';
-import { Heading, Text, Button, Icon, Progress } from '@chakra-ui/react'
+import { Heading, Text, Button, Icon, Progress, 
+	SimpleGrid, Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { coffeeIcon } from '../public/coffee'
 import Link from 'next/link'
 
 export default function Recipe() {
 
 
-	const [result, setResult] = useState(['','','',''])
+	const [result, setResult] = useState(['','',''])
 	const [ingredientNames, setIngredientNames] = useState([])
 	const [isLoading, setIsLoading] = useState(true)
 
@@ -19,18 +19,6 @@ export default function Recipe() {
 	const { data } = router.query;
 	const {cuisine} = router.query;
   	const pantry = data ? JSON.parse(data) : null;
-
-	const [im, setIm] = useState({
-		results: [
-				{
-					'width':72,
-					'height': 72,
-					'urls': {
-						'regular': ''
-					}
-				}
-			]
-	});
 
 	async function loadRecipe(){
 		// Create a list of names of ingredients for passing to GPT API
@@ -53,10 +41,10 @@ export default function Recipe() {
 	      if (response.status !== 200) {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
-	      setResult(data.result.split(':'));
-
-	      // Generate image from DallE
-	      await getImg(data.result.split(':')[1].toString().slice(0,-12));
+	      // console.log(data.result)
+	      if(data.result != undefined){
+	      		setResult(await formatRecipes(data.result))
+	      }
 		    } catch(error) {
 		      // Consider implementing your own error handling logic here
 		      console.error(error);
@@ -65,13 +53,23 @@ export default function Recipe() {
 
 		}
 
+		function showRecipes(recipe) {
+			recipe.ingredients = recipe.ingredients.split('\n')
+			recipe.instructions = recipe.instructions.split('\n')
+			console.log('passing recipe: ', recipe)
+			router.push({
+			    pathname: '/recipeDetails',
+			    query: { data: JSON.stringify(recipe) }
+		 		 })	
+		}
+
 	useEffect(() => {
         loadRecipe();
     }, [])
 
 
+  // Generate image from DallE
 	async function getImg(recipe){
-			
 		try {
 	      const response = await fetch("/../api/dalle", {
 	        method: "POST",
@@ -86,16 +84,45 @@ export default function Recipe() {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
 	      if(data !== null){
-	      	setIsLoading(false);
-	      	setIm(data.photo)	
+	      	return data.photo;
 	      }
 
-		    } catch(error) {
-		      // Consider implementing your own error handling logic here
-		      console.error(error);
-		      alert(error.message);
-		    }
+	    } catch(error) {
+	      // Consider implementing your own error handling logic here
+	      console.error(error);
+	      alert(error.message);
+	    }
+			
 		}
+
+
+	async function formatRecipes(data){
+		var recipes = [];
+		var recipeSplitData = data.split('@recipe');
+		for(var i=1;i<=3;i++) {
+			var recipe_i =  recipeSplitData[i].split(':')
+			var recipe = {
+				"title": recipe_i[0].split('\nP')[0].trim(),
+				"prepTime": recipe_i[1].split("\n")[0].trim(),
+				"cookTime": recipe_i[2].split('\n')[0].trim(),
+				"difficulty": recipe_i[3].split('\n\n')[0].trim(),
+				"ingredients": recipe_i[4].split('\n\n')[0].trim(),
+				// "optional": recipe_i[5].split('\n\n')[0],
+				"instructions": recipe_i[5].trim(),
+				"image": await getImg(recipe_i[0].split('\nP')[0].trim())
+				// "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
+				
+				
+			}
+
+			recipes.push(recipe);
+			if(i==3){
+	      		setIsLoading(false)
+			}
+		}
+		console.log(isLoading)
+		return recipes;
+	}
 
 	return (
 		<div className={styles.container}>
@@ -116,15 +143,33 @@ export default function Recipe() {
 	          		<Heading className={styles.pointer} onClick = {() => router.push({
 						    pathname: '/'})}> Chef'd</Heading>
 	        	</div>
-		        <div className={styles.recipeBody}>
+		        <div className={styles.recipeList}>
 		        	{isLoading && <Progress size='sm' colorScheme = "green" isIndeterminate />}
-		        	<Image className={styles.recipeImage} src={im} width={480}
-	    			 height = {480} alt = {result[1].toString().slice(0,-12)}/>
-			    	<Heading as='h3' mt='16px'>{result[1].toString().slice(0,-12)}</Heading>
-			    	<Heading as='h4' size = 'md' mt = '8px'>{result[1].toString().slice(-11,)}</Heading>
-			    	<Text>{result[2].toString().slice(0,-13)}</Text>
-			    	<Heading as='h4' size='md' mt = '8px'>{result[2].toString().slice(-12,)}</Heading>
-			    	<Text>{result[3]}</Text>
+		        	<SimpleGrid spacing= {4} templateColumns='repeat(auto-fill, minmax(200px, 1fr))' mt = '8px' ml = '24px'>
+	        	{result.map((recipe) => (
+		          	<Card size='sm' maxW='720vh' mt='16vh' align ='center'
+		          		key= {recipe.title} _hover={{ shadow: 'md', 
+  						transform: 'scale(1.1)' }}
+      					transition="transform 0.2s"
+						cursor="pointer"
+						onClick={() => showRecipes(recipe)}>
+					  	<CardBody>
+						    <Image
+						      src= {recipe.image}
+						      alt='Some edible food'
+						      width = '320'
+						      height = '144'
+						      placeholder = 'https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'
+						    />
+						      <Text size='xl' align='Center' as='b'>{recipe.title}</Text>
+					  </CardBody>
+					  <CardFooter>
+					      <Text size='sm' align='Left' color='green'>Prep Time {recipe.prepTime}</Text>
+					      <Text size='sm' align='Right' color='green'>Cook Time {recipe.cookTime}</Text>
+					  </CardFooter>
+					</Card>
+				))}
+			</SimpleGrid>
 	        	</div>
 	        	<div className={styles.fabBottom}>
 		            <Link href = "https://www.buymeacoffee.com/tilakshenoy">
