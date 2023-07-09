@@ -67,8 +67,8 @@ export default function Recipe() {
 				console.log('error')
 		  		return (
 		  			toast({
-		          title: 'Your pantry is empty!',
-		          description: "You can't cook anything if you don't tell us what you got.",
+		          title: 'Recipes are still loading',
+		          description: "Please wait until we load recipes for you",
 		          status: 'error',
 		          duration: 5000,
 		          isClosable: true,
