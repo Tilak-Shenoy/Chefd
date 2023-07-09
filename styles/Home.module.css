@@ -8,7 +8,7 @@
 
 .header{
   color: #ffffff;
-  background: #1D5E24;
+  background: #32704E;
   position:fixed;
   z-index: 1;
   padding-right: 100%;
@@ -42,7 +42,8 @@
 .title {
   text-align: center;
 }
-.nav {;
+.nav {
+  height: 100%; width:100%;
 }
 
 .title,
@@ -141,7 +142,7 @@
 
 .button {
   color: #ffffff;
-  background-color: #1D5E24;
+  background-color: #32704E;
   margin-top: 16px;
   border-radius: 8px;
 }
@@ -162,7 +163,7 @@
 .recipeBody{
   margin-left: 24px;
   padding-top: 72px;
-  padding-bottom: 32px;
+  padding-bottom: 64px;
 }
 
 .fabDiv{
@@ -180,7 +181,7 @@
 }
 .greenText{
   background-color: #ffffff;
-  color: #1D5E24;
+  color: #32704E;
 }
 
 .search {
@@ -190,7 +191,7 @@
 }
 
 .greenBg {
-  background-color: #1D5E24;
+  background-color: #32704E;
 }
 
 .ingCard {
@@ -211,4 +212,16 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.loginButton{
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.recipeList{
+  /*position: fixed;
+  top: 32px;
+  z-index: 1;*/
 }

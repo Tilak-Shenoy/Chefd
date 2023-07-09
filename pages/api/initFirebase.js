@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import {analytics} from "@firebase/analytics"
 import {performance} from "@firebase/performance"
+import { getAuth } from 'firebase/auth'
 
 
 const clientCredentials = {
@@ -17,3 +18,4 @@ const clientCredentials = {
 
 export const app = initializeApp(clientCredentials);
 export const database = getFirestore(app);
+export const auth = getAuth();

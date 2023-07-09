@@ -1,13 +1,32 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import firebase from "../pages/api/initFirebase"
+import { firebase, auth } from "./api/initFirebase"
 import ReadFirebase from "../pages/api/readFirebase"
 import { Analytics } from '@vercel/analytics/react';
 import { Heading, Button, Icon, HStack } from '@chakra-ui/react'
 import { coffeeIcon } from '../public/coffee'
 import Link from 'next/link'
+import { useState } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Home() {
+
+
+  const [user, setUser] = useState(null);
+  const { data, status } = useSession();
+
+  if (status === 'loading') return <h1> loading... please wait</h1>;
+  if (status === 'authenticated') {
+    if(user === null){
+      loadUser(data.user)
+    }
+  }
+
+
+  function loadUser(userDetails) {
+    console.log('Set')
+    setUser(userDetails);
+  }
 
   return (
       <div className={styles.container}>
@@ -27,6 +46,7 @@ export default function Home() {
           <div className = {styles.header}>
             <HStack className = {styles.nav} spacing='72px'>
               <Heading> Chef'd</Heading>
+              
             </HStack>
           </div>
           <div> 
