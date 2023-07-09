@@ -46,8 +46,7 @@ export default function Home() {
           <div className = {styles.header}>
             <HStack className = {styles.nav} spacing='72px'>
               <Heading> Chef'd</Heading>
-              <Button size= 'md' variant = 'solid' className={styles.loginButton} colorScheme='white' onClick = {() => signIn('google') }>Login</Button>
-
+              
             </HStack>
           </div>
           <div> 

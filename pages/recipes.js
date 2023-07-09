@@ -4,14 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
 import Image from 'next/image';
 import { Heading, Text, Button, Icon, Progress, 
-	SimpleGrid, Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
+	SimpleGrid, Card, CardHeader, CardBody, CardFooter, useToast } from '@chakra-ui/react'
 import { coffeeIcon } from '../public/coffee'
 import Link from 'next/link'
+import { cache } from 'memory-cache';
 
 export default function Recipe() {
 
 
-	const [result, setResult] = useState(['','',''])
+	const [result, setResult] = useState([{'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
+										  {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
+										  {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
+										])
 	const [ingredientNames, setIngredientNames] = useState([])
 	const [isLoading, setIsLoading] = useState(true)
 
@@ -19,8 +23,11 @@ export default function Recipe() {
 	const { data } = router.query;
 	const {cuisine} = router.query;
   	const pantry = data ? JSON.parse(data) : null;
+  	const cacheKey = JSON.stringify({ ingredients: pantry, cuisine });
+  	var cache = require('memory-cache');
+	const toast = useToast()
 
-	async function loadRecipe(){
+	async function loadRecipe(cacheKey){
 		// Create a list of names of ingredients for passing to GPT API
 		var ingNames =[]
 
@@ -41,9 +48,10 @@ export default function Recipe() {
 	      if (response.status !== 200) {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
-	      // console.log(data.result)
 	      if(data.result != undefined){
-	      		setResult(await formatRecipes(data.result))
+	      		const formattedResult = await formatRecipes(data.result)
+	      		setResult(formattedResult)
+	      		cache.put(cacheKey, formattedResult, 1000 * 60 * 10);
 	      }
 		    } catch(error) {
 		      // Consider implementing your own error handling logic here
@@ -54,9 +62,24 @@ export default function Recipe() {
 		}
 
 		function showRecipes(recipe) {
-			recipe.ingredients = recipe.ingredients.split('\n')
-			recipe.instructions = recipe.instructions.split('\n')
-			console.log('passing recipe: ', recipe)
+			// Avoid user to click on the card before loading the recipe
+			if(!cache.get(cacheKey)){
+				console.log('error')
+		  		return (
+		  			toast({
+		          title: 'Your pantry is empty!',
+		          description: "You can't cook anything if you don't tell us what you got.",
+		          status: 'error',
+		          duration: 5000,
+		          isClosable: true,
+		        })
+			)
+			}
+			if(!recipe.isVisted){
+				recipe.ingredients = recipe.ingredients.split('\n')
+				recipe.instructions = recipe.instructions.split('\n')
+				recipe.isVisted = true
+			}
 			router.push({
 			    pathname: '/recipeDetails',
 			    query: { data: JSON.stringify(recipe) }
@@ -64,7 +87,25 @@ export default function Recipe() {
 		}
 
 	useEffect(() => {
-        loadRecipe();
+		const fetchData = async () => {
+		    const cachedResult = cache.get(cacheKey);
+		    if (cachedResult) {
+	        	setResult(cachedResult);
+	      	} else {
+        		loadRecipe(cacheKey);	
+	      	}
+	      	toast.closeAll();
+	      	 return (
+	      	 	toast({
+		          title: 'Your recipes are loading',
+		          description: "Please wait for up to a minute while we load your recipes",
+		          status: 'info',
+		          duration: 10000,
+		          isClosable: true,
+        		}))
+	      };
+
+	      fetchData();
     }, [])
 
 
@@ -109,8 +150,10 @@ export default function Recipe() {
 				"ingredients": recipe_i[4].split('\n\n')[0].trim(),
 				// "optional": recipe_i[5].split('\n\n')[0],
 				"instructions": recipe_i[5].trim(),
-				"image": await getImg(recipe_i[0].split('\nP')[0].trim())
-				// "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
+				"image": await getImg(recipe_i[0].split('\nP')[0].trim()),
+				//used for formatting purposes
+				"isVisited": false
+				
 				
 				
 			}
@@ -120,7 +163,6 @@ export default function Recipe() {
 	      		setIsLoading(false)
 			}
 		}
-		console.log(isLoading)
 		return recipes;
 	}
 
@@ -159,7 +201,8 @@ export default function Recipe() {
 						      alt='Some edible food'
 						      width = '320'
 						      height = '144'
-						      placeholder = 'https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'
+						      placeholder = 'blur'
+						      blurDataURL='https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'
 						    />
 						      <Text size='xl' align='Center' as='b'>{recipe.title}</Text>
 					  </CardBody>
