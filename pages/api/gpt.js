@@ -11,7 +11,13 @@ export const config = {
 };
 
 export default async function Gpt(req, res) {
-  console.log('#####', req.body.ingredients)
+  console.log('#####', req.searchParams)
+
+
+  return new Response(JSON.stringify({name: 'hello'}),{
+    status: 200,
+  })
+
   if (!configuration.apiKey) {
     const res = new Response(null,
     {

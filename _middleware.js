@@ -4,6 +4,8 @@ export default function middleware(req) {
       if(req.method != 'POST'){
        return new NextResponse("Cannot access this endpoint with " + req.method, { status: 400})
       }
+
+      console.log('Middleware:  ',req.body.ingredients)
    return NextResponse.next();
    }
 }
