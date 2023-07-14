@@ -74,6 +74,7 @@ export default async function Gpt(req, res) {
   }
 }
 
+
 function generatePrompt(ingredients, cuisine) {
   var message = [];
   var pantry = ingredients.join();
