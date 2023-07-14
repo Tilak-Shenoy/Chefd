@@ -21,9 +21,9 @@ export default function Recipe() {
 
 	const router = useRouter();
 	const { data } = router.query;
-	const {cuisine} = router.query;
+	const {cuisineType} = router.query;
   	const pantry = data ? JSON.parse(data) : null;
-  	const cacheKey = JSON.stringify({ ingredients: pantry, cuisine });
+  	const cacheKey = JSON.stringify({ ingredients: pantry, cuisineType });
   	var cache = require('memory-cache');
 	const toast = useToast()
 
@@ -35,13 +35,20 @@ export default function Recipe() {
 			ingNames.push(pantry[x].name)
 		}
 
+
+		console.log('ingNames: ', ingNames)
+		const requestData = {
+			ingredients: ingNames,
+			cuisine: cuisineType,
+		}
+
 		try {
 	      const response = await fetch("/../api/gpt", {
 	        method: "POST",
 	        headers: {
 	          "Content-Type": "application/json",
 	        },
-	        body: JSON.stringify({ ingredients: ingNames }, { cuisine: cuisine}),
+	        body: JSON.stringify(requestData),
 	      });
 
 	      const data = await response.json();
@@ -49,6 +56,7 @@ export default function Recipe() {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
 	      if(data.result != undefined){
+	      		console.log('API Fetched: ', data.result)
 	      		const formattedResult = await formatRecipes(data.result)
 	      		setResult(formattedResult)
 	      		cache.put(cacheKey, formattedResult, 1000 * 60 * 10);
@@ -150,7 +158,9 @@ export default function Recipe() {
 				"ingredients": recipe_i[4].split('\n\n')[0].trim(),
 				// "optional": recipe_i[5].split('\n\n')[0],
 				"instructions": recipe_i[5].trim(),
-				"image": await getImg(recipe_i[0].split('\nP')[0].trim()),
+				"image": 
+				// "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
+				await getImg(recipe_i[0].split('\nP')[0].trim()),
 				//used for formatting purposes
 				"isVisited": false
 				

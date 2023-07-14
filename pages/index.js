@@ -7,20 +7,20 @@ import { Heading, Button, Icon, HStack } from '@chakra-ui/react'
 import { coffeeIcon } from '../public/coffee'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useSession, signIn, signOut } from 'next-auth/react';
+// import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Home() {
 
 
   const [user, setUser] = useState(null);
-  const { data, status } = useSession();
+  // const { data, status } = useSession();
 
-  if (status === 'loading') return <h1> loading... please wait</h1>;
-  if (status === 'authenticated') {
-    if(user === null){
-      loadUser(data.user)
-    }
-  }
+  // if (status === 'loading') return <h1> loading... please wait</h1>;
+  // if (status === 'authenticated') {
+  //   if(user === null){
+  //     loadUser(data.user)
+  //   }
+  // }
 
 
   function loadUser(userDetails) {
