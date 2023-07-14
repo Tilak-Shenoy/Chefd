@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai-edge";
+import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_OPENAI_API_KEY,
@@ -7,43 +7,30 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export const config = {
-  runtime: 'edge', // this is a pre-requisite
+  api: {
+    runtime: 'edge',
+  },
 };
 
 export default async function Gpt(req, res) {
-  console.log('#####', req.searchParams)
-
-
-  return new Response(JSON.stringify({name: 'hello'}),{
-    status: 200,
-  })
-
   if (!configuration.apiKey) {
-    const res = new Response(null,
-    {
-      status: 500,
-      statusText: 'Internal Server Error',
-    })
-    const error= {
-      message: "OpenAI API key not configured, please follow instructions in README.md",
-    }
-    return res.json(error);
+    res.status(500).json({
+      error: {
+        message: "OpenAI API key not configured, please follow instructions in README.md",
+      }
+    });
+    return;
   }
 
   const ingredients = req.body.ingredients || '';
   if (ingredients.length === 0) {
-    const res = new Response(null,
-    {
-      status: 500,
-      statusText: 'Internal Server Error',
-    })
-    const error= {
-      message: "Please chosse at least one ingredient",
-    }
-    return res.json(error);
+    res.status(400).json({
+      error: {
+        message: "Please choose at least one ingredient.",
+      }
+    });
+    return;
   }
-
-  console.log('ing',ingredients)
 
   const cuisine = req.body.cuisine || '';
 
@@ -57,12 +44,8 @@ export default async function Gpt(req, res) {
       stop: ["input:"],
       temperature: 0.2
     });
-    const res = new Response(null,
-    {
-      status: 200,
-      statusText: 'OK',
-    })
-    res.json({ result: completion.data.choices[0].message.content });
+    console.log('Tokens used: ', completion.data.usage.total_tokens)
+    res.status(200).json({ result: completion.data.choices[0].message.content });
 
     // const completion = await openai.createCompletion({
     //   model: "text-davinci-003",
@@ -85,6 +68,7 @@ export default async function Gpt(req, res) {
       res.status(500).json({
         error: {
           message: 'An error occurred during your request.',
+          cause: error
         }
       });
     }
