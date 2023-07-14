@@ -10,8 +10,8 @@ export const config = {
   runtime: 'edge', // this is a pre-requisite
 };
 
-export default async function Gpt(context, res) {
-  console.log('#####', context.request.body.ingredients)
+export default async function Gpt(req, res) {
+  console.log('#####', req.body.ingredients)
   if (!configuration.apiKey) {
     const res = new Response(null,
     {
