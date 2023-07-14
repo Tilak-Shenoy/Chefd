@@ -7,9 +7,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export const config = {
-  api: {
     runtime: 'edge',
-  },
 };
 
 export default async function Gpt(req, res) {
