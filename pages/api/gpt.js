@@ -6,13 +6,13 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-export const config = {
-    runtime: 'edge',
-};
+// export const config = {
+//     runtime: 'edge',
+// };
 
 export default async function Gpt(req, res) {
   if (!configuration.apiKey) {
-    res.status(500).json({
+    res.status(400).json({
       error: {
         message: "OpenAI API key not configured, please follow instructions in README.md",
       }
@@ -21,6 +21,9 @@ export default async function Gpt(req, res) {
   }
 
   const ingredients = req.body.ingredients || '';
+  const cuisine = req.body.cuisine || '';
+
+  console.log(ingredients)
   if (ingredients.length === 0) {
     res.status(400).json({
       error: {
@@ -29,8 +32,6 @@ export default async function Gpt(req, res) {
     });
     return;
   }
-
-  const cuisine = req.body.cuisine || '';
 
   try {
     const completion = await openai.createChatCompletion({
