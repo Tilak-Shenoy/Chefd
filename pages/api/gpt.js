@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, OpenAIApi } from "openai-edge";
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_OPENAI_API_KEY,
@@ -7,30 +7,37 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export const config = {
-  api: {
-    runtime: 'edge',
-  },
+  runtime: 'edge', // this is a pre-requisite
 };
 
-export default async function Gpt(req, res) {
+export default async function Gpt(context, res) {
+  console.log('#####', context.request.body.ingredients)
   if (!configuration.apiKey) {
-    res.status(500).json({
-      error: {
-        message: "OpenAI API key not configured, please follow instructions in README.md",
-      }
-    });
-    return;
+    const res = new Response(null,
+    {
+      status: 500,
+      statusText: 'Internal Server Error',
+    })
+    const error= {
+      message: "OpenAI API key not configured, please follow instructions in README.md",
+    }
+    return res.json(error);
   }
 
   const ingredients = req.body.ingredients || '';
   if (ingredients.length === 0) {
-    res.status(400).json({
-      error: {
-        message: "Please choose at least one ingredient.",
-      }
-    });
-    return;
+    const res = new Response(null,
+    {
+      status: 500,
+      statusText: 'Internal Server Error',
+    })
+    const error= {
+      message: "Please chosse at least one ingredient",
+    }
+    return res.json(error);
   }
+
+  console.log('ing',ingredients)
 
   const cuisine = req.body.cuisine || '';
 
@@ -44,7 +51,12 @@ export default async function Gpt(req, res) {
       stop: ["input:"],
       temperature: 0.2
     });
-    res.status(200).json({ result: completion.data.choices[0].message.content });
+    const res = new Response(null,
+    {
+      status: 200,
+      statusText: 'OK',
+    })
+    res.json({ result: completion.data.choices[0].message.content });
 
     // const completion = await openai.createCompletion({
     //   model: "text-davinci-003",
