@@ -10,7 +10,6 @@ export default function middleware(req) {
       } else{
          const response = await fetch('/../api/gpt');
          const recipe = response.json();
-         console.log('Recipe: ', recipe);
 
          return new Response(JSON.stringify({ title: recipe }), {
            status: 200,

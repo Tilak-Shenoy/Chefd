@@ -12,12 +12,12 @@ const openai = new OpenAIApi(configuration);
 
 export default async function Gpt(req, res) {
   if (!configuration.apiKey) {
-    res.status(400).json({
-      error: {
-        message: "OpenAI API key not configured, please follow instructions in README.md",
-      }
+    console.log("1")
+    return new Response({error: "OpenAI API key not configured, please follow instructions in README.md",
+      },{
+      status: 500
     });
-    return;
+    
   }
 
   const ingredients = req.body.ingredients || '';
@@ -25,12 +25,11 @@ export default async function Gpt(req, res) {
 
   console.log(ingredients)
   if (ingredients.length === 0) {
-    res.status(400).json({
-      error: {
-        message: "Please choose at least one ingredient.",
-      }
+    console.log("2")
+    return new Response( {error: "Please choose at least one ingredient.",
+      },{
+      status: 500
     });
-    return;
   }
 
   try {
@@ -44,6 +43,7 @@ export default async function Gpt(req, res) {
       temperature: 0.2
     });
     console.log('Tokens used: ', completion.data.usage.total_tokens)
+    console.log(completion.data.choices[0].message.content)
     res.status(200).json({ result: completion.data.choices[0].message.content });
 
     // const completion = await openai.createCompletion({
@@ -90,6 +90,6 @@ function generatePrompt(ingredients, cuisine) {
   }
 
   message.push({"role": "assistant", "content": "Anything else to keep in mind?"}, 
-  { "role": "user", "content": ". Suggest me three recipes with the above ingredients. Provide the prep time and the cook time for each recipe, and the difficulty level. Feel free to disregard irrelevant ingredients. Start every recipe with an @recipe. Do not include a recipe number. Mark all the optional ingredients in brackets."})
+  { "role": "user", "content": ". Suggest me one recipe with the above ingredients. Provide the prep time and the cook time for each recipe, and the difficulty level. Feel free to disregard irrelevant ingredients. Start every recipe with an @recipe. Do not include a recipe number. Mark all the optional ingredients in brackets."})
   return message
 }

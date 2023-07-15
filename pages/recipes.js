@@ -13,8 +13,8 @@ export default function Recipe() {
 
 
 	const [result, setResult] = useState([{'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
-										  {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
-										  {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
+										  // {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
+										  // {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
 										])
 	const [ingredientNames, setIngredientNames] = useState([])
 	const [isLoading, setIsLoading] = useState(true)
@@ -56,7 +56,6 @@ export default function Recipe() {
 	        throw data.error || new Error(`Request failed with status ${response.status}`);
 	      }
 	      if(data.result != undefined){
-	      		console.log('API Fetched: ', data.result)
 	      		const formattedResult = await formatRecipes(data.result)
 	      		setResult(formattedResult)
 	      		cache.put(cacheKey, formattedResult, 1000 * 60 * 10);
@@ -99,6 +98,7 @@ export default function Recipe() {
 		    const cachedResult = cache.get(cacheKey);
 		    if (cachedResult) {
 	        	setResult(cachedResult);
+	        	setIsLoading(false);
 	      	} else {
         		loadRecipe(cacheKey);	
 	      	}
@@ -148,8 +148,9 @@ export default function Recipe() {
 	async function formatRecipes(data){
 		var recipes = [];
 		var recipeSplitData = data.split('@recipe');
-		for(var i=1;i<=3;i++) {
-			var recipe_i =  recipeSplitData[i].split(':')
+		// for(var i=1;i<=3;i++) {
+			var recipe_i =  recipeSplitData[1].split(':')
+			console.log(recipeSplitData)
 			var recipe = {
 				"title": recipe_i[0].split('\nP')[0].trim(),
 				"prepTime": recipe_i[1].split("\n")[0].trim(),
@@ -169,9 +170,8 @@ export default function Recipe() {
 			}
 
 			recipes.push(recipe);
-			if(i==3){
+			if(recipes[0].image){
 	      		setIsLoading(false)
-			}
 		}
 		return recipes;
 	}
@@ -196,7 +196,7 @@ export default function Recipe() {
 						    pathname: '/'})}> Chef'd</Heading>
 	        	</div>
 		        <div className={styles.recipeList}>
-		        	{isLoading && <Progress size='sm' colorScheme = "green" isIndeterminate />}
+		        	{isLoading && <Progress size='md' colorScheme = "green" isIndeterminate />}
 		        	<SimpleGrid spacing= {4} templateColumns='repeat(auto-fill, minmax(200px, 1fr))' mt = '8px' ml = '24px'>
 	        	{result.map((recipe) => (
 		          	<Card size='sm' maxW='720vh' mt='16vh' align ='center'
@@ -217,8 +217,8 @@ export default function Recipe() {
 						      <Text size='xl' align='Center' as='b'>{recipe.title}</Text>
 					  </CardBody>
 					  <CardFooter>
-					      <Text size='sm' align='Left' color='green'>Prep Time {recipe.prepTime}</Text>
-					      <Text size='sm' align='Right' color='green'>Cook Time {recipe.cookTime}</Text>
+					      {!isLoading && <Text size='sm' align='Left' color='green'>Prep Time {recipe.prepTime}</Text>}
+					      {!isLoading && <Text size='sm' align='Right' color='green'>Cook Time {recipe.cookTime}</Text>}
 					  </CardFooter>
 					</Card>
 				))}
