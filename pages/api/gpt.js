@@ -58,12 +58,12 @@ export default async function Gpt(req, res) {
 
 function generatePrompt(ingredients, cuisine) {
   if (cuisine === ''){
-    return `Suggest one recipe with following key ingredients. Clearly show the recipe name, ingredients and instructions.
+    return `Suggest one recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
   Discard any unnecessary ingredients
     Ingredients: ${ingredients}`;
 
   } else {
-    return `Suggest one ${cuisine} recipe with following key ingredients. Clearly show the recipe name, ingredients and instructions.
+    return `Suggest one ${cuisine} recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
   Discard any unnecessary ingredients
     Ingredients: ${ingredients}`;
   }
