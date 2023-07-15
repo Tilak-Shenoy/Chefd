@@ -225,3 +225,8 @@
   top: 32px;
   z-index: 1;*/
 }
+
+.progress {
+  position: fixed;
+  top: 72px;
+}
