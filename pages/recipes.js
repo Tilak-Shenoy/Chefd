@@ -3,7 +3,7 @@ import Head from 'next/head'
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
 import Image from 'next/image';
-import { Heading, Text, Button, Icon } from '@chakra-ui/react'
+import { Heading, Text, Button, Icon, useToast } from '@chakra-ui/react'
 import { coffeeIcon } from '../public/coffee'
 import Link from 'next/link'
 import { cache } from 'memory-cache';
@@ -13,6 +13,8 @@ export default function Recipe() {
 
 	const [result, setResult] = useState(['','','',''])
 	const [ingredientNames, setIngredientNames] = useState([])
+	const toast = useToast()
+
 
 	const router = useRouter();
 	const { data } = router.query;
@@ -69,7 +71,20 @@ export default function Recipe() {
 		}
 
 	useEffect(() => {
-        loadRecipe();
+		const fetchData = async () => {
+			loadRecipe();
+        toast.closeAll();
+	      	 return (
+	      	 	toast({
+		          title: 'Your recipes are loading',
+		          description: "Please wait for 10 seconds while we load your recipes",
+		          status: 'info',
+		          duration: 10000,
+		          isClosable: true,
+        		}))
+	      };
+
+	      fetchData();
     }, [])
 
 
