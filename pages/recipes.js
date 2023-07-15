@@ -35,8 +35,6 @@ export default function Recipe() {
 			ingNames.push(pantry[x].name)
 		}
 
-
-		console.log('ingNames: ', ingNames)
 		const requestData = {
 			ingredients: ingNames,
 			cuisine: cuisineType,
@@ -151,10 +149,8 @@ export default function Recipe() {
 	function formatRecipes(data){
 		var recipes = [];
 		// var recipeSplitData = data.split('@recipe');
-		console.log('data ',data)
 		// for(var i=1;i<=3;i++) {
 			var recipe_i =  data.split(':')
-			console.log(recipe_i)
 			var recipe = {
 				"title": recipe_i[1].split('\nP')[0].trim(),
 				"prepTime": recipe_i[2].split("\n")[0].trim(),
