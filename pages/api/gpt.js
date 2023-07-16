@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, OpenAIApi } from "openai-edge";
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_OPENAI_API_KEY,
@@ -6,27 +6,52 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
+export const config = {
+    runtime: 'edge',
+};
+
 export default async function Gpt(req, res) {
   if (!configuration.apiKey) {
-    res.status(500).json({
-      error: {
-        message: "OpenAI API key not configured, please follow instructions in README.md",
-      }
+    let error = {
+      message: "OpenAI API key not configured, please use a valid API key"
+    }
+    res = new Response(JSON.stringify(error), {
+      status: 500,
+       headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*' // Optional: Add CORS header
+    }
     });
-    return;
+    return res;
   }
 
-  const ingredients = req.body.ingredients || '';
+  // req is a ReadableStream when edge function is used.
+  const body = req.body;
+  const textDecoder = new TextDecoder()
+  var data  = {}
+  for await (const chunk of body.values({ preventCancel: true })) {
+  // Decode the chunk to get the right data 
+    data = textDecoder.decode(chunk)
+  }
+
+  let jsonData = JSON.parse(data)
+
+  const ingredients = jsonData.ingredients || '';
+  const cuisine = jsonData.cuisine || '';
+
   if (ingredients.length === 0) {
-    res.status(400).json({
-      error: {
+    let error = {
         message: "Please choose at least one ingredient.",
+    }
+    return new Response(JSON.stringify(error), {
+      status: 500,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*' // Optional: Add CORS header
       }
     });
-    return;
   }
 
-  const cuisine = req.body.cuisine || '';
 
   try {
     const completion = await openai.createCompletion({
@@ -39,19 +64,53 @@ export default async function Gpt(req, res) {
       stop: ["input:"],
       temperature: 0.6,
     });
-    res.status(200).json({ result: completion.data.choices[0].text });
+
+
+    var responseData  = ''
+    for await (const chunk of completion.body.values({ preventCancel: true })) {
+      // Decode the chunk to get the right data 
+      responseData += textDecoder.decode(chunk)
+    }
+
+    let jsonResponse = JSON.parse(responseData)
+    console.log('Tokens used: ', jsonResponse.usage.total_tokens)
+
+    let response = {
+      result: jsonResponse.choices[0].text
+    }
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*' // Optional: Add CORS header
+      }
+    });
   } catch(error) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
       console.error(error.response.status, error.response.data);
-      res.status(error.response.status).json(error.response.data);
+      return new Response(JSON.stringify(error.response.data), {
+        status: error.response.status,
+        headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*' // Optional: Add CORS header
+      }
+      });
     } else {
       console.error(`Error with OpenAI API request: ${error.message}`);
-      res.status(500).json({
-        error: {
-          message: 'An error occurred during your request.',
+      let errorMessage = {
+          message: 'An error occurred during your request.'
+      }
+
+      return new Response(JSON.stringify(errorMessage), {
+        status: 500,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*' // Optional: Add CORS header
         }
       });
+      
     }
   }
 }
