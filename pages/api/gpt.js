@@ -117,13 +117,13 @@ export default async function Gpt(req, res) {
 
 function generatePrompt(ingredients, cuisine) {
   if (cuisine === ''){
-    return `Suggest one recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
-  Discard any unnecessary ingredients
-    Ingredients: ${ingredients}`;
+    return `You are a michelin star chef with immense knowledge of ingredients, produce and food. Suggest three recipes with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
+  Discard any unnecessary ingredients.
+    Ingredients: ${ingredients}. Feel free to disregard irrelevant ingredients. Start every recipe with an @recipe. Do not include a recipe number. Mark all the optional ingredients in brackets. Do not include the word title`;
 
   } else {
-    return `Suggest one ${cuisine} recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
-  Discard any unnecessary ingredients
-    Ingredients: ${ingredients}`;
+    return ` You are a michelin star chef with immense knowledge of ingredients, produce and food. Suggest three ${cuisine} recipes with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
+  Discard any unnecessary ingredients.
+    Ingredients: ${ingredients}. Feel free to disregard irrelevant ingredients. Start every recipe with an @recipe. Do not include a recipe number. Mark all the optional ingredients in brackets. Do not include the word title`;
   }
 }
