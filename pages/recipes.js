@@ -12,9 +12,7 @@ import { cache } from 'memory-cache';
 export default function Recipe() {
 
 
-	const [result, setResult] = useState([{'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
-										  // {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
-										  // {'image': "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"},
+	const [result, setResult] = useState([
 										])
 	const [ingredientNames, setIngredientNames] = useState([])
 	const [isLoading, setIsLoading] = useState(true)
@@ -27,7 +25,21 @@ export default function Recipe() {
   	var cache = require('memory-cache');
 	const toast = useToast()
 
-	async function loadRecipe(cacheKey){
+	async function loadRecipe(cacheKey, genMore = false){
+		//Disable the button if the generate more button is clicked
+		if(isLoading) {
+			console.log('Generate more is clicked before recipe was generated.')
+  		return (
+  			toast({
+          title: 'Take deep breaths!',
+          description: "Give us some time to load your recipe.",
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+			)
+		}
+
 		// Create a list of names of ingredients for passing to GPT API
 		var ingNames =[]
 
@@ -35,10 +47,29 @@ export default function Recipe() {
 			ingNames.push(pantry[x].name)
 		}
 
-		const requestData = {
-			ingredients: ingNames,
-			cuisine: cuisineType,
+		let requestData = {};
+		//Send a toast indicating the recipe is generating when the user clicks generate more
+		if(genMore){
+			setIsLoading(true);
+			callToast()
+			const generatedRecipes = cache.get(cacheKey)
+			const titles = [];
+			generatedRecipes.forEach((recipe) => {
+				titles.push(recipe.title)
+			});
+			requestData = {
+				ingredients: ingNames,
+				cuisine: cuisineType,
+				generatedRecipes: generatedRecipes,
+			}
+		} else {
+			requestData = {
+				ingredients: ingNames,
+				cuisine: cuisineType,
+			}
 		}
+
+		
 
 		try {
 	      const response = await fetch("/../api/gpt", {
@@ -56,9 +87,17 @@ export default function Recipe() {
 	      if(data.result != undefined){
 	      		const formattedResult = formatRecipes(data.result)
 	      		formattedResult[0].image = await getImg(formattedResult[0].title)
-	      		setResult(formattedResult)
-	      		// Cache the result for 10mins
-	      		cache.put(cacheKey, formattedResult, 1000 * 60 * 10);
+	      		setResult([...result, formattedResult[0]]);
+	      		//If extra recipes are generated, pull all the recipes from the cache and append the new recipe.
+	      		if(genMore){
+	      			let formattedCache = cache.get(cacheKey);
+	      			formattedCache.push(formattedResult[0]);
+		      		// Cache the result for 10mins
+		      		cache.put(cacheKey, formattedCache, 1000 * 60 * 10);
+	      		} else {
+		      		// Cache the result for 10mins
+		      		cache.put(cacheKey, formattedResult, 1000 * 60 * 10);
+	      		}
 	      }
 		    } catch(error) {
 		      // Consider implementing your own error handling logic here
@@ -66,6 +105,18 @@ export default function Recipe() {
 		      alert(error.message);
 		    }
 
+		}
+
+		function callToast() {
+			toast.closeAll();
+	      	 return (
+	      	 	toast({
+		          title: 'Your recipes are loading',
+		          description: "Please wait while we load your recipes",
+		          status: 'info',
+		          duration: 5000,
+		          isClosable: true,
+        		}))
 		}
 
 		function showRecipes(recipe) {
@@ -106,9 +157,9 @@ export default function Recipe() {
 	      	 return (
 	      	 	toast({
 		          title: 'Your recipes are loading',
-		          description: "Please wait for up to a minute while we load your recipes",
+		          description: "Please wait while we load your recipes",
 		          status: 'info',
-		          duration: 10000,
+		          duration: 5000,
 		          isClosable: true,
         		}))
 	      };
@@ -149,26 +200,26 @@ export default function Recipe() {
 	function formatRecipes(data){
 		var recipes = [];
 		// var recipeSplitData = data.split('@recipe');
+		
 		// for(var i=1;i<=3;i++) {
 			var recipe_i =  data.split(':')
 			var recipe = {
 				"title": recipe_i[1].split('\nP')[0].trim(),
 				"prepTime": recipe_i[2].split("\n")[0].trim(),
 				"cookTime": recipe_i[3].split('\n')[0].trim(),
-				"difficulty": recipe_i[4].split('\n\n')[0].trim(),
-				"ingredients": recipe_i[5].split('\n\n')[0].trim(),
+				"difficulty": recipe_i[4].split('\n')[0].trim(),
+				"ingredients": recipe_i[5].split('\nI')[0].trim(),
 				// "optional": recipe_i[5].split('\n\n')[0],
 				"instructions": recipe_i[6].trim(),
 				"image": 
 				"https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
 				//used for formatting purposes
 				"isVisited": false
-				
-				
+							
 				
 			}
-
 			recipes.push(recipe);
+		// }
 		return recipes;
 	}
 
@@ -191,34 +242,40 @@ export default function Recipe() {
 	          		<Heading className={styles.pointer} onClick = {() => router.push({
 						    pathname: '/'})}> Chef'd</Heading>
 	        	</div>
-		        <div className={styles.recipeList}>
-		        	{isLoading && <Progress size='md' className = {styles.progress} colorScheme = "green" isIndeterminate />}
-		        	<SimpleGrid spacing= {4} templateColumns='repeat(auto-fill, minmax(200px, 1fr))' mt = '8px' ml = '24px'>
-	        	{result.map((recipe) => (
-		          	<Card size='sm' maxW='720vh' mt='16vh' align ='center'
-		          		key= {recipe.title} _hover={{ shadow: 'md', 
-  						transform: 'scale(1.1)' }}
-      					transition="transform 0.2s"
-						cursor="pointer"
-						onClick={() => showRecipes(recipe)}>
-					  	<CardBody>
-						    <Image
-						      src= {recipe.image}
-						      alt='Some edible food'
-						      width = '320'
-						      height = '144'
-						      placeholder = 'blur'
-						      blurDataURL='https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'
-						    />
-						      <Text size='xl' align='Center' as='b'>{recipe.title}</Text>
-					  </CardBody>
-					  <CardFooter>
-					      {!isLoading && <Text size='sm' align='Left' color='green'>Prep Time {recipe.prepTime}</Text>}
-					      {!isLoading && <Text size='sm' align='Right' color='green'>Cook Time {recipe.cookTime}</Text>}
-					  </CardFooter>
-					</Card>
-				))}
-			</SimpleGrid>
+	        	<div>
+		        	<div className={styles.fabDiv}>
+		    			<Button colorScheme = "dark green" className = {styles.button}  size="md" mt = '3vh'
+		    				onClick = {() => loadRecipe(cacheKey, true) }>Generate More</Button>
+		    		</div>
+			        <div className={styles.recipeList}>
+			        	{isLoading && <Progress size='md' className = {styles.progress} colorScheme = "green" isIndeterminate />}
+			        	<SimpleGrid spacing= {4} templateColumns='repeat(auto-fill, minmax(200px, 1fr))' mt = '8px' ml = '24px'>
+		        		{result.map((recipe) => (
+				          	<Card size='sm' maxW='720vh' mt='16vh' align ='center'
+				          		key= {recipe.title} _hover={{ shadow: 'md', 
+		  						transform: 'scale(1.1)' }}
+		      					transition="transform 0.2s"
+								cursor="pointer"
+								onClick={() => showRecipes(recipe)}>
+							  	<CardBody>
+								    <Image
+								      src= {recipe.image}
+								      alt='Some edible food'
+								      width = '320'
+								      height = '144'
+								      placeholder = 'blur'
+								      blurDataURL='https://images.unsplash.com/photo-1576021182211-9ea8dced3690?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'
+								    />
+								      <Text size='xl' align='Center' as='b'>{recipe.title}</Text>
+							  </CardBody>
+							  <CardFooter>
+							      {!isLoading && <Text size='sm' align='Left' color='green'>Prep Time {recipe.prepTime}</Text>}
+							      {!isLoading && <Text size='sm' align='Right' color='green'>Cook Time {recipe.cookTime}</Text>}
+							  </CardFooter>
+							</Card>
+						))}
+						</SimpleGrid>
+		        	</div>
 	        	</div>
 	        	<div className={styles.fabBottom}>
 		            <Link href = "https://www.buymeacoffee.com/tilakshenoy">
@@ -227,10 +284,8 @@ export default function Recipe() {
 		             </Link>
           		</div>
         	</main>
-
-        	
-
-    	</div>
+		    		
+		</div>
 
 	)
 }

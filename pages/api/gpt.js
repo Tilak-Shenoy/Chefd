@@ -1,14 +1,17 @@
 import { Configuration, OpenAIApi } from "openai-edge";
 
+// Configure OpenAI API
 const configuration = new Configuration({
   apiKey: process.env.NEXT_OPENAI_API_KEY,
 });
-
 const openai = new OpenAIApi(configuration);
 
+// Configure edge function for faster req-resp
 export const config = {
     runtime: 'edge',
 };
+
+var cache = require('memory-cache');
 
 export default async function Gpt(req, res) {
   if (!configuration.apiKey) {
@@ -38,6 +41,7 @@ export default async function Gpt(req, res) {
 
   const ingredients = jsonData.ingredients || '';
   const cuisine = jsonData.cuisine || '';
+  const generatedRecipes = jsonData.generatedRecipes || ''
 
   if (ingredients.length === 0) {
     let error = {
@@ -56,7 +60,7 @@ export default async function Gpt(req, res) {
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: generatePrompt(ingredients, cuisine),
+      prompt: generatePrompt(ingredients, cuisine, generatedRecipes),
       max_tokens: 1000,
       top_p: 1,
       frequency_penalty: 0,
@@ -79,6 +83,7 @@ export default async function Gpt(req, res) {
       result: jsonResponse.choices[0].text
     }
 
+    cache.put(jsonData, jsonResponse.choices[0].text, 1000 * 60 * 10);
     return new Response(JSON.stringify(response), {
       status: 200,
       headers: { 
@@ -115,15 +120,21 @@ export default async function Gpt(req, res) {
   }
 }
 
-function generatePrompt(ingredients, cuisine) {
+function generatePrompt(ingredients, cuisine, generatedRecipes) {
+  let prompt = ''
   if (cuisine === ''){
-    return `Suggest one recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
-  Discard any unnecessary ingredients
-    Ingredients: ${ingredients}`;
+    prompt =  `You are a michelin star chef with immense knowledge of ingredients, produce and food. Suggest me a different recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
+  Discard any unnecessary ingredients.
+    Ingredients: ${ingredients}. Feel free to disregard irrelevant ingredients.`;
 
   } else {
-    return `Suggest one ${cuisine} recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
-  Discard any unnecessary ingredients
-    Ingredients: ${ingredients}`;
+    prompt = ` You are a michelin star chef with immense knowledge of ingredients, produce and food. Suggest a ${cuisine} recipe with following key ingredients. Clearly show the recipe name, prep time, cook time, difficulty level, ingredients and instructions.
+  Discard any unnecessary ingredients.
+    Ingredients: ${ingredients}. Feel free to disregard irrelevant ingredients.`;
   }
+
+  if(generatedRecipes != '') {
+    prompt += ` I already have ${generatedRecipes}. Give me something new.`
+  }
+  return prompt;
 }
