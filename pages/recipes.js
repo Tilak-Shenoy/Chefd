@@ -26,6 +26,20 @@ export default function Recipe() {
 	const toast = useToast()
 
 	async function loadRecipe(cacheKey, genMore = false){
+		//Disable the button if the generate more button is clicked
+		if(isLoading) {
+			console.log('Generate more is clicked before recipe was generated.')
+  		return (
+  			toast({
+          title: 'Take deep breaths!',
+          description: "Give us some time to load your recipe.",
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+			)
+		}
+
 		// Create a list of names of ingredients for passing to GPT API
 		var ingNames =[]
 
