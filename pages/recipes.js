@@ -27,7 +27,7 @@ export default function Recipe() {
 
 	async function loadRecipe(cacheKey, genMore = false){
 		//Disable the button if the generate more button is clicked
-		if(isLoading) {
+		if(isLoading && genMore) {
 			console.log('Generate more is clicked before recipe was generated.')
   		return (
   			toast({

@@ -56,7 +56,7 @@ export default async function Gpt(req, res) {
     });
   }
 
-
+  console.log('Generating recipes...')
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
